@@ -32,9 +32,6 @@ func (pl *ResParkingLot) CreateParkingLot(lot int) *ResParkingLot {
 }
 
 func (pl *ResParkingLot) Allocated(regis, colors string) (*ResParkingLot, string) {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 
 	var res string
 	for _, v := range pl.Data {
@@ -52,9 +49,6 @@ func (pl *ResParkingLot) Allocated(regis, colors string) (*ResParkingLot, string
 }
 
 func (pl *ResParkingLot) Leave(lot int) (*ResParkingLot, string) {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 	var res string
 	num := strconv.Itoa(lot)
 	for _, v := range pl.Data {
@@ -67,9 +61,6 @@ func (pl *ResParkingLot) Leave(lot int) (*ResParkingLot, string) {
 }
 
 func (pl *ResParkingLot) Status() *ResParkingLot {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 	log.Println("Slot No.				Registration No.			Colour         ")
 	for _, v := range pl.Data {
 		a := fmt.Sprintf("%v					%v				%v", v["lot_number"], v["regis_number"], v["color"])
@@ -79,9 +70,6 @@ func (pl *ResParkingLot) Status() *ResParkingLot {
 }
 
 func (pl *ResParkingLot) FindByColor(color string) (*ResParkingLot, string) {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 	var res string
 	var list []string
 	for _, v := range pl.Data {
@@ -103,9 +91,6 @@ func (pl *ResParkingLot) FindByColor(color string) (*ResParkingLot, string) {
 }
 
 func (pl *ResParkingLot) FindByRegis(regis string) (*ResParkingLot, string) {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 
 	var res string
 	var list []string
@@ -125,9 +110,6 @@ func (pl *ResParkingLot) FindByRegis(regis string) (*ResParkingLot, string) {
 }
 
 func (pl *ResParkingLot) FindByLot(color string) (*ResParkingLot, string) {
-	if len(pl.Data) == 0 {
-		log.Fatal("Must CreateParkingLot first ")
-	}
 
 	var res string
 	var list []string
@@ -176,7 +158,6 @@ func Reader(actionParking *ResParkingLot) {
 }
 
 func InputType(actionParking *ResParkingLot, input []string) *ResParkingLot {
-	obj := &ResParkingLot{}
 	var msg string
 	switch input[0] {
 	case "create_parking_lot":
@@ -185,34 +166,53 @@ func InputType(actionParking *ResParkingLot, input []string) *ResParkingLot {
 			log.Fatal("convert failed", err)
 		}
 
-		obj = actionParking.CreateParkingLot(lot)
-		msg = fmt.Sprintf("Created a parking lot with %v slots", len(obj.Data))
+		actionParking = actionParking.CreateParkingLot(lot)
+		msg = fmt.Sprintf("Created a parking lot with %v slots", len(actionParking.Data))
 		log.Println(msg)
 	case "park":
-		obj, msg = actionParking.Allocated(input[1], input[2])
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
+		actionParking, msg = actionParking.Allocated(input[1], input[2])
 		log.Println(msg)
 	case "leave":
+
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
 		lot, err := strconv.Atoi(input[1])
 		if err != nil {
 			log.Fatal("convert failed", err)
 		}
-		obj, msg = actionParking.Leave(lot)
+		actionParking, msg = actionParking.Leave(lot)
 		log.Println(msg)
 	case "status":
-		obj = actionParking.Status()
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
+		actionParking = actionParking.Status()
 	case "registration_numbers_for_cars_with_colour":
-		obj, msg = actionParking.FindByColor(input[1])
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
+		actionParking, msg = actionParking.FindByColor(input[1])
 		log.Println(msg)
 	case "slot_number_for_registration_number":
-		obj, msg = actionParking.FindByRegis(input[1])
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
+		actionParking, msg = actionParking.FindByRegis(input[1])
 		log.Println(msg)
 	case "slot_numbers_for_cars_with_colour":
-		obj, msg = actionParking.FindByLot(input[1])
+		if len(actionParking.Data) == 0 {
+			log.Fatal("Must CreateParkingLot first ")
+		}
+		actionParking, msg = actionParking.FindByLot(input[1])
 		log.Println(msg)
 	case "exit":
 		os.Exit(3)
 	}
-	return obj
+	return actionParking
 
 }
 
